@@ -35,6 +35,21 @@ NS_ASSUME_NONNULL_BEGIN
                                                          UITextViewDelegate>
 
 /**
+ *  Channel id string (check the firebase database structure)
+ */
+@property (nonatomic, strong) NSString *channelId;
+
+/**
+ *  Any string identifying the sender
+ */
+@property (nonatomic, strong) NSString *senderId;
+
+/**
+ *  Any string indicating the name or nick name of the sender
+ */
+@property (nonatomic, strong) NSString *senderDisplayName;
+
+/**
  *  Returns the collection view object managed by this view controller.
  *  This view controller is the collection view's data source and delegate.
  */

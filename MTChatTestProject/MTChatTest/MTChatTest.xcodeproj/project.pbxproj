@@ -13,7 +13,40 @@
 		47943CF61ED9E4CE004F6B6A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 47943CF41ED9E4CE004F6B6A /* Main.storyboard */; };
 		47943CF81ED9E4CE004F6B6A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47943CF71ED9E4CE004F6B6A /* Assets.xcassets */; };
 		47943CFB1ED9E4CE004F6B6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 47943CF91ED9E4CE004F6B6A /* LaunchScreen.storyboard */; };
+		47CA82B21ED9EBDA008222EA /* MTChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47CA82B11ED9EB06008222EA /* MTChat.framework */; };
+		47CA82B31ED9EBDA008222EA /* MTChat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 47CA82B11ED9EB06008222EA /* MTChat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		47CA82B01ED9EB06008222EA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 47CA82AC1ED9EB06008222EA /* MTChat.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 47943BD31ED9D203004F6B6A;
+			remoteInfo = MTChat;
+		};
+		47CA82B41ED9EBDA008222EA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 47CA82AC1ED9EB06008222EA /* MTChat.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 47943BD21ED9D203004F6B6A;
+			remoteInfo = MTChat;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		47CA82B61ED9EBDA008222EA /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				47CA82B31ED9EBDA008222EA /* MTChat.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		47943CE81ED9E4CE004F6B6A /* MTChatTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MTChatTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -26,6 +59,7 @@
 		47943CF71ED9E4CE004F6B6A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		47943CFA1ED9E4CE004F6B6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		47943CFC1ED9E4CF004F6B6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		47CA82AC1ED9EB06008222EA /* MTChat.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MTChat.xcodeproj; path = ../../../../../../Rostyslav.Stepanyak/Work/iOS/MTChat/MTChat/MTChat.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47CA82B21ED9EBDA008222EA /* MTChat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +77,7 @@
 		47943CDF1ED9E4CE004F6B6A = {
 			isa = PBXGroup;
 			children = (
+				47CA82AC1ED9EB06008222EA /* MTChat.xcodeproj */,
 				47943CEA1ED9E4CE004F6B6A /* MTChatTest */,
 				47943CE91ED9E4CE004F6B6A /* Products */,
 			);
@@ -79,6 +115,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		47CA82AD1ED9EB06008222EA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				47CA82B11ED9EB06008222EA /* MTChat.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -89,10 +133,12 @@
 				47943CE41ED9E4CE004F6B6A /* Sources */,
 				47943CE51ED9E4CE004F6B6A /* Frameworks */,
 				47943CE61ED9E4CE004F6B6A /* Resources */,
+				47CA82B61ED9EBDA008222EA /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				47CA82B51ED9EBDA008222EA /* PBXTargetDependency */,
 			);
 			name = MTChatTest;
 			productName = MTChatTest;
@@ -126,12 +172,28 @@
 			mainGroup = 47943CDF1ED9E4CE004F6B6A;
 			productRefGroup = 47943CE91ED9E4CE004F6B6A /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 47CA82AD1ED9EB06008222EA /* Products */;
+					ProjectRef = 47CA82AC1ED9EB06008222EA /* MTChat.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				47943CE71ED9E4CE004F6B6A /* MTChatTest */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		47CA82B11ED9EB06008222EA /* MTChat.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = MTChat.framework;
+			remoteRef = 47CA82B01ED9EB06008222EA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		47943CE61ED9E4CE004F6B6A /* Resources */ = {
@@ -158,6 +220,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		47CA82B51ED9EBDA008222EA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MTChat;
+			targetProxy = 47CA82B41ED9EBDA008222EA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		47943CF41ED9E4CE004F6B6A /* Main.storyboard */ = {
@@ -312,6 +382,7 @@
 				47943D011ED9E4CF004F6B6A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

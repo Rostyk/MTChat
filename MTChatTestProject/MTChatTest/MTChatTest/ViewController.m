@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+@import MTChat;
 
 @interface ViewController ()
 
@@ -16,7 +17,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    MTChatViewController *chatViewController = [MTChatViewController new];
+    chatViewController.senderDisplayName = @"Ross";
+    chatViewController.channelId = @"hockey";
+    chatViewController.senderId = @"ros.@aphex@gmail.com";
+    
+    [self.navigationController pushViewController:chatViewController animated:YES];
+
 }
 
 

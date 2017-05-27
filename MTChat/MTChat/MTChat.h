@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MTChat/MTChatViewController.h>
 
 //! Project version number for MTChat.
 FOUNDATION_EXPORT double MTChatVersionNumber;

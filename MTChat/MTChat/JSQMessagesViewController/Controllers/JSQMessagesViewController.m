@@ -17,9 +17,9 @@
 //
 
 #import "JSQMessagesViewController.h"
-
 #import "JSQMessagesCollectionViewFlowLayoutInvalidationContext.h"
 
+#import "JSQMessage.h"
 #import "JSQMessageData.h"
 #import "JSQMessageBubbleImageDataSource.h"
 #import "JSQMessageAvatarImageDataSource.h"
@@ -32,7 +32,12 @@
 
 #import "NSString+JSQMessages.h"
 #import "NSBundle+JSQMessages.h"
+#import "JSQMessagesBubbleImageFactory.h"
+#import "UIColor+JSQMessages.h"
 
+#import <FirebaseCore/FirebaseCore.h>
+#import <FirebaseAuth/FirebaseAuth.h>
+#import <FirebaseDatabase/FirebaseDatabase.h>
 #import <objc/runtime.h>
 
 
@@ -114,9 +119,16 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 @property (strong, nonatomic) IBOutlet JSQMessagesInputToolbar *inputToolbar;
 
 @property (nonatomic) NSLayoutConstraint *toolbarHeightConstraint;
-
 @property (strong, nonatomic) NSIndexPath *selectedIndexPathForMenu;
 
+@property (nonatomic, strong) NSMutableArray *messages;
+
+@property (nonatomic, strong) id<JSQMessageBubbleImageDataSource> outgoingBubbleImageView;
+@property (nonatomic, strong) id<JSQMessageBubbleImageDataSource> incomingBubbleImageView;
+
+@property (nonatomic, strong) FIRDatabaseReference *channelRef;
+@property (nonatomic, strong) FIRDatabaseReference *messageRef;
+@property (nonatomic) FIRDatabaseHandle newMessageRefHandle;
 @end
 
 
@@ -141,6 +153,42 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     if (self == [JSQMessagesViewController self]) {
         JSQInstallWorkaroundForSheetPresentationIssue26295020();
     }
+}
+
+- (id<JSQMessageBubbleImageDataSource>)setupOutgoingBubble {
+    JSQMessagesBubbleImageFactory *factory = [JSQMessagesBubbleImageFactory new];
+    return [factory outgoingMessagesBubbleImageWithColor:[UIColor jsq_messageBubbleBlueColor]];
+}
+
+- (id<JSQMessageBubbleImageDataSource>)setupIncomingBubble {
+    JSQMessagesBubbleImageFactory *factory = [JSQMessagesBubbleImageFactory new];
+    return [factory outgoingMessagesBubbleImageWithColor:[UIColor jsq_messageBubbleLightGrayColor]];
+}
+
+#pragma mark - access overrides
+
+- (NSMutableArray *)messages {
+    if (!_messages) {
+        _messages = [NSMutableArray new];
+    }
+    
+    return _messages;
+}
+
+- (id<JSQMessageBubbleImageDataSource>)incomingBubbleImageView {
+    if (!_incomingBubbleImageView) {
+        _incomingBubbleImageView = [self setupIncomingBubble];
+    }
+    
+    return _incomingBubbleImageView;
+}
+
+- (id<JSQMessageBubbleImageDataSource>)outgoingBubbleImageView {
+    if (!_outgoingBubbleImageView) {
+        _outgoingBubbleImageView = [self setupOutgoingBubble];
+    }
+    
+    return _outgoingBubbleImageView;
 }
 
 #pragma mark - Initialization
@@ -179,6 +227,14 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     self.additionalContentInset = UIEdgeInsetsZero;
 
     [self jsq_updateCollectionViewInsets];
+}
+
+- (void)addMessage:(NSString *)senderId name:(NSString *)name text:(NSString *)text {
+    JSQMessage *message = [[JSQMessage alloc] initWithSenderId:senderId
+                                             senderDisplayName:name
+                                                          date:[NSDate new]
+                                                          text:text];
+    [self.messages addObject:message];
 }
 
 - (void)dealloc
@@ -233,7 +289,70 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
     [self jsq_configureMessagesViewController];
     [self jsq_registerForNotifications:YES];
+    
+    _collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
+    _collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
+    
+    [FIRApp configure];
+    
+    [[FIRAuth auth] signInAnonymouslyWithCompletion:^(FIRUser * _Nullable user, NSError * _Nullable error) {
+        if (error) {
+            //handle the error
+        }
+        else {
+            [self observeMessages];
+        }
+    }];
 }
+
+- (void)observeMessages {
+    self.channelRef = [[[[FIRDatabase database] reference] child:@"channels"] child:_channelId];
+    self.messageRef = [self.channelRef child:@"messages"];
+    
+    FIRDatabaseQuery *messageQuery = [self.messageRef queryLimitedToLast:25];
+    self.newMessageRefHandle = [messageQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
+        
+        NSDictionary *messageData = snapshot.value;
+        
+        NSString *senderId = messageData[@"senderId"];
+        NSString *senderName = messageData[@"senderName"];
+        NSString *text = messageData[@"text"];
+        
+        if (senderId && senderName && text && text.length > 0) {
+            [self addMessage:senderId
+                        name:senderName
+                        text:text];
+            [self finishReceivingMessage];
+        }
+        else {
+            //Error
+        }
+    }];
+}
+/*
+private func observeMessages() {
+    messageRef = channelRef!.child("messages")
+    // 1.
+    let messageQuery = messageRef.queryLimited(toLast:25)
+    
+    // 2. We can use the observe method to listen for new
+    // messages being written to the Firebase DB
+    newMessageRefHandle = messageQuery.observe(.childAdded, with: { (snapshot) -> Void in
+        // 3
+        let messageData = snapshot.value as! Dictionary<String, String>
+        
+        if let id = messageData["senderId"] as String!, let name = messageData["senderName"] as String!, let text = messageData["text"] as String!, text.characters.count > 0 {
+            // 4
+            self.addMessage(withId: id, name: name, text: text)
+            
+            // 5
+            self.finishReceivingMessage()
+        } else {
+            print("Error! Could not decode message data")
+        }
+    })
+}*/
+
 
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -255,6 +374,11 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
+    /*[self addMessage:@"fo" name:@"Zag" text:@"freestyler"];
+    
+    [self addMessage:_senderId name:@"Me" text:@"Hey"];
+    [self addMessage:_senderId name:@"Me" text:@"Piu piu"];*/
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -324,7 +448,13 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
          senderDisplayName:(NSString *)senderDisplayName
                       date:(NSDate *)date
 {
-    NSAssert(NO, @"Error! required method not implemented in subclass. Need to implement %s", __PRETTY_FUNCTION__);
+    FIRDatabaseReference *itemRef = [self.messageRef childByAutoId];
+    NSDictionary *messageDict = @{@"senderId" : senderId,
+                                  @"senderName" : senderDisplayName,
+                                  @"text" : text};
+    
+    [itemRef setValue:messageDict];
+    [self finishSendingMessage];
 }
 
 - (void)didPressAccessoryButton:(UIButton *)sender
@@ -436,20 +566,17 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
 - (NSString *)senderDisplayName
 {
-    NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
-    return nil;
+    return _senderDisplayName;
 }
 
 - (NSString *)senderId
 {
-    NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
-    return nil;
+    return _senderId;
 }
 
 - (id<JSQMessageData>)collectionView:(JSQMessagesCollectionView *)collectionView messageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
-    return nil;
+    return self.messages[indexPath.row];
 }
 
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView didDeleteMessageAtIndexPath:(NSIndexPath *)indexPath
@@ -459,13 +586,18 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
 - (id<JSQMessageBubbleImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView messageBubbleImageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
-    return nil;
+    JSQMessage *message  = self.messages[indexPath.row];
+    
+    if ([[message senderId] isEqualToString:_senderId]) {
+        return self.outgoingBubbleImageView;
+    }
+    else {
+        return self.incomingBubbleImageView;
+    }
 }
 
 - (id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
     return nil;
 }
 
@@ -488,7 +620,7 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return 0;
+    return self.messages.count;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
@@ -575,6 +707,14 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     cell.layer.shouldRasterize = YES;
     [self collectionView:collectionView accessibilityForCell:cell indexPath:indexPath message:messageItem];
 
+    JSQMessage *message = self.messages[indexPath.row];
+    
+    if ([message.senderId isEqualToString:_senderId]) {
+        cell.textView.textColor = [UIColor whiteColor];
+    }
+    else {
+        cell.textView.textColor = [UIColor blackColor];
+    }
     return cell;
 }
 
