@@ -128,6 +128,11 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
 @property (nonatomic, strong) FIRDatabaseReference *channelRef;
 @property (nonatomic, strong) FIRDatabaseReference *messageRef;
+@property (nonatomic, strong) FIRDatabaseReference *userIsTypingRef;
+@property (nonatomic, strong) FIRDatabaseQuery *userIsTypingQuery;
+@property (nonatomic) BOOL localTyping;
+@property (nonatomic) BOOL isTyping;
+
 @property (nonatomic) FIRDatabaseHandle newMessageRefHandle;
 @end
 
@@ -166,6 +171,22 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 }
 
 #pragma mark - access overrides
+
+- (FIRDatabaseQuery *)userIsTypingQuery {
+    if (!_userIsTypingQuery) {
+        _userIsTypingQuery = [[[self.channelRef child:@"typingIndicator"] queryOrderedByValue] queryEqualToValue:@(1)];
+    }
+    
+    return _userIsTypingQuery;
+}
+
+- (FIRDatabaseReference *)userIsTypingRef {
+    if (!_userIsTypingRef) {
+        _userIsTypingRef =  [[self.channelRef child:@"typingIndicator"] child:_channelId];
+    }
+    
+    return _userIsTypingRef;
+}
 
 - (NSMutableArray *)messages {
     if (!_messages) {
@@ -301,6 +322,7 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
         }
         else {
             [self observeMessages];
+            [self observeTyping];
         }
     }];
 }
@@ -329,30 +351,34 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
         }
     }];
 }
-/*
-private func observeMessages() {
-    messageRef = channelRef!.child("messages")
-    // 1.
-    let messageQuery = messageRef.queryLimited(toLast:25)
-    
-    // 2. We can use the observe method to listen for new
-    // messages being written to the Firebase DB
-    newMessageRefHandle = messageQuery.observe(.childAdded, with: { (snapshot) -> Void in
-        // 3
-        let messageData = snapshot.value as! Dictionary<String, String>
-        
-        if let id = messageData["senderId"] as String!, let name = messageData["senderName"] as String!, let text = messageData["text"] as String!, text.characters.count > 0 {
-            // 4
-            self.addMessage(withId: id, name: name, text: text)
-            
-            // 5
-            self.finishReceivingMessage()
-        } else {
-            print("Error! Could not decode message data")
-        }
-    })
-}*/
 
+- (void)observeTyping {
+    FIRDatabaseReference *typingIndicatorRef = [self.channelRef child:@"typingIndicator"];
+    self.userIsTypingRef = [typingIndicatorRef child:_senderId];
+    [self.userIsTypingRef onDisconnectRemoveValue];
+    
+    [self.userIsTypingQuery observeEventType:FIRDataEventTypeValue withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
+        if (snapshot.childrenCount == 1 && self.isTyping) {
+            return;
+        }
+        
+        self.showTypingIndicator = snapshot.childrenCount > 0;
+        [self scrollToBottomAnimated:YES];
+    }];
+}
+
+- (BOOL)isTyping {
+    return _localTyping;
+}
+
+- (void)setIsTyping:(BOOL)isTyping {
+    _localTyping = isTyping;
+    
+    if (isTyping)
+        [self.userIsTypingRef setValue:@(1)];
+    else
+        [self.userIsTypingRef setValue:@(0)];
+}
 
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -374,11 +400,6 @@ private func observeMessages() {
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    /*[self addMessage:@"fo" name:@"Zag" text:@"freestyler"];
-    
-    [self addMessage:_senderId name:@"Me" text:@"Hey"];
-    [self addMessage:_senderId name:@"Me" text:@"Piu piu"];*/
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -455,6 +476,8 @@ private func observeMessages() {
     
     [itemRef setValue:messageDict];
     [self finishSendingMessage];
+    
+    self.isTyping = false;
 }
 
 - (void)didPressAccessoryButton:(UIButton *)sender
@@ -943,6 +966,8 @@ private func observeMessages() {
     if (textView != self.inputToolbar.contentView.textView) {
         return;
     }
+    
+    self.isTyping = textView.text.length > 0;
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView

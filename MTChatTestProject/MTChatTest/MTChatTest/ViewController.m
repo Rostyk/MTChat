@@ -19,9 +19,9 @@
     [super viewDidLoad];
     
     MTChatViewController *chatViewController = [MTChatViewController new];
-    chatViewController.senderDisplayName = @"Ross";
+    chatViewController.senderDisplayName = @"User1";
     chatViewController.channelId = @"hockey";
-    chatViewController.senderId = @"ros.@aphex@gmail.com";
+    chatViewController.senderId = @"user1";
     
     [self.navigationController pushViewController:chatViewController animated:YES];
 
