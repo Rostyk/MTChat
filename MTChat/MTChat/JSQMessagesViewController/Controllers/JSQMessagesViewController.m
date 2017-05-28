@@ -19,6 +19,8 @@
 #import "JSQMessagesViewController.h"
 #import "JSQMessagesCollectionViewFlowLayoutInvalidationContext.h"
 
+#import "UIImage+animatedGIF.h"
+#import "JSQPhotoMediaItem.h"
 #import "JSQMessage.h"
 #import "JSQMessageData.h"
 #import "JSQMessageBubbleImageDataSource.h"
@@ -35,11 +37,15 @@
 #import "JSQMessagesBubbleImageFactory.h"
 #import "UIColor+JSQMessages.h"
 
+#import <FirebaseStorage/FirebaseStorage.h>
 #import <FirebaseCore/FirebaseCore.h>
 #import <FirebaseAuth/FirebaseAuth.h>
 #import <FirebaseDatabase/FirebaseDatabase.h>
+
+#import <Photos/Photos.h>
 #import <objc/runtime.h>
 
+#define     imageURLNotSetKey            @"NOTSET"
 
 // Fixes rdar://26295020
 // See issue #1247 and Peter Steinberger's comment:
@@ -113,7 +119,7 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 }
 
 
-@interface JSQMessagesViewController () <JSQMessagesInputToolbarDelegate>
+@interface JSQMessagesViewController () <JSQMessagesInputToolbarDelegate, UIImagePickerControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet JSQMessagesCollectionView *collectionView;
 @property (strong, nonatomic) IBOutlet JSQMessagesInputToolbar *inputToolbar;
@@ -134,6 +140,9 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 @property (nonatomic) BOOL isTyping;
 
 @property (nonatomic) FIRDatabaseHandle newMessageRefHandle;
+@property (nonatomic) FIRDatabaseHandle updatedMessageRefHandle;
+@property (nonatomic, strong) FIRStorageReference *storageRef;
+@property (nonatomic, strong) NSMutableDictionary *photoMessageMap;
 @end
 
 
@@ -171,6 +180,22 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 }
 
 #pragma mark - access overrides
+
+- (NSMutableDictionary *)photoMessageMap {
+    if (!_photoMessageMap) {
+        _photoMessageMap = [NSMutableDictionary new];
+    }
+    
+    return _photoMessageMap;
+}
+
+- (FIRStorageReference *)storageRef {
+    if (!_storageRef) {
+        _storageRef = [[FIRStorage storage] referenceForURL:@"gs://betterthan-e5be9.appspot.com"];
+    }
+    
+    return _storageRef;
+}
 
 - (FIRDatabaseQuery *)userIsTypingQuery {
     if (!_userIsTypingQuery) {
@@ -250,6 +275,8 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     [self jsq_updateCollectionViewInsets];
 }
 
+#pragma mark - send messages
+
 - (void)addMessage:(NSString *)senderId name:(NSString *)name text:(NSString *)text {
     JSQMessage *message = [[JSQMessage alloc] initWithSenderId:senderId
                                              senderDisplayName:name
@@ -258,16 +285,36 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     [self.messages addObject:message];
 }
 
-- (void)dealloc
-{
-    [self jsq_registerForNotifications:NO];
-
-    _collectionView.dataSource = nil;
-    _collectionView.delegate = nil;
-
-    _inputToolbar.contentView.textView.delegate = nil;
-    _inputToolbar.delegate = nil;
+- (void)addPhotoMessage:(NSString *)senderId key:(NSString *)key mediaItem:(JSQPhotoMediaItem *)mediaItem {
+    JSQMessage *message = [[JSQMessage alloc] initWithSenderId:senderId
+                                             senderDisplayName:@""
+                                                          date:[NSDate new]
+                                                         media:mediaItem];
+    [self.messages addObject:message];
+    
+    if (mediaItem.image == nil) {
+        [self.photoMessageMap setObject:mediaItem forKey:key];
+    }
+    
+    [_collectionView reloadData];
 }
+
+- (NSString *)sendPhotoMessage {
+    FIRDatabaseReference *itemRef = [self.messageRef childByAutoId];
+    NSDictionary *messageItem = @{@"photoURL" : imageURLNotSetKey,
+                                  @"senderId" : self.senderId};
+    
+    [itemRef setValue:messageItem];
+    [self finishSendingMessage];
+    
+    return itemRef.key;
+}
+
+- (void)setImageURL:(NSString *)url forMessageWithKey:(NSString *)key {
+    FIRDatabaseReference *itemRef = [self.messageRef child:key];
+    [itemRef updateChildValues:@{@"photoURL" : url}];
+}
+
 
 #pragma mark - Setters
 
@@ -313,71 +360,21 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     
     _collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
     _collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
-    
+    [self authenticate];
+}
+
+- (void)authenticate {
     [FIRApp configure];
-    
+    __weak typeof(self) weakSelf = self;
     [[FIRAuth auth] signInAnonymouslyWithCompletion:^(FIRUser * _Nullable user, NSError * _Nullable error) {
         if (error) {
             //handle the error
         }
         else {
-            [self observeMessages];
-            [self observeTyping];
+            [weakSelf observeMessages];
+            [weakSelf observeTyping];
         }
     }];
-}
-
-- (void)observeMessages {
-    self.channelRef = [[[[FIRDatabase database] reference] child:@"channels"] child:_channelId];
-    self.messageRef = [self.channelRef child:@"messages"];
-    
-    FIRDatabaseQuery *messageQuery = [self.messageRef queryLimitedToLast:25];
-    self.newMessageRefHandle = [messageQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
-        
-        NSDictionary *messageData = snapshot.value;
-        
-        NSString *senderId = messageData[@"senderId"];
-        NSString *senderName = messageData[@"senderName"];
-        NSString *text = messageData[@"text"];
-        
-        if (senderId && senderName && text && text.length > 0) {
-            [self addMessage:senderId
-                        name:senderName
-                        text:text];
-            [self finishReceivingMessage];
-        }
-        else {
-            //Error
-        }
-    }];
-}
-
-- (void)observeTyping {
-    FIRDatabaseReference *typingIndicatorRef = [self.channelRef child:@"typingIndicator"];
-    self.userIsTypingRef = [typingIndicatorRef child:_senderId];
-    [self.userIsTypingRef onDisconnectRemoveValue];
-    
-    [self.userIsTypingQuery observeEventType:FIRDataEventTypeValue withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
-        if (snapshot.childrenCount == 1 && self.isTyping) {
-            return;
-        }
-        
-        self.showTypingIndicator = snapshot.childrenCount > 0;
-        [self scrollToBottomAnimated:YES];
-    }];
-}
-
-- (BOOL)isTyping {
-    return _localTyping;
-}
-
-- (void)setIsTyping:(BOOL)isTyping {
-    _localTyping = isTyping;
-    
-    if (isTyping)
-        [self.userIsTypingRef setValue:@(1)];
-    else
-        [self.userIsTypingRef setValue:@(0)];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -482,7 +479,17 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
 - (void)didPressAccessoryButton:(UIButton *)sender
 {
-    NSAssert(NO, @"Error! required method not implemented in subclass. Need to implement %s", __PRETTY_FUNCTION__);
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+    }
+    else {
+        picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    }
+    
+    [self presentViewController:picker animated:YES completion:NULL];
 }
 
 - (void)finishSendingMessage
@@ -1117,6 +1124,208 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
                                                        bottomValue:CGRectGetHeight(keyboardEndFrame) + insets.bottom];
                      }
                      completion:nil];
+}
+
+#pragma mark - syncing the messages
+
+- (void)observeMessages {
+    self.channelRef = [[[[FIRDatabase database] reference] child:@"channels"] child:_channelId];
+    self.messageRef = [self.channelRef child:@"messages"];
+    
+    FIRDatabaseQuery *messageQuery = [self.messageRef queryLimitedToLast:25];
+    self.newMessageRefHandle = [messageQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
+        
+        NSDictionary *messageData = snapshot.value;
+        
+        NSString *senderId = messageData[@"senderId"];
+        NSString *senderName = messageData[@"senderName"];
+        NSString *text = messageData[@"text"];
+        
+        if (senderId && senderName && text && text.length > 0) {
+            [self addMessage:senderId
+                        name:senderName
+                        text:text];
+            [self finishReceivingMessage];
+            
+        }
+        else if (senderId){
+            NSString *photoURL = messageData[@"photoURL"];
+            JSQPhotoMediaItem *mediaItem = [[JSQPhotoMediaItem alloc] initWithMaskAsOutgoing: [senderId isEqualToString:self.senderId]];
+            
+            [self addPhotoMessage:senderId key:snapshot.key mediaItem:mediaItem];
+            
+            if ([photoURL hasPrefix:@"gs://"]) {
+                [self fetchImageDataAtURL:photoURL
+                             forMediaItem:mediaItem clearsPhotoMessageMapOnSuccessForKey:nil];
+            }
+            
+            [self finishSendingMessage];
+        }
+        else {
+            //Error
+        }
+    }];
+    
+    self.updatedMessageRefHandle = [self.messageRef observeEventType:FIRDataEventTypeChildChanged withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
+        NSString *key = snapshot.key;
+        NSDictionary *messageDict = snapshot.value;
+        
+        NSString *photoURL = messageDict[@"photoURL"];
+        
+        if (photoURL) {
+            JSQPhotoMediaItem *mediaItem = [self.photoMessageMap objectForKey:key];
+            if (mediaItem) {
+                [self fetchImageDataAtURL:photoURL
+                             forMediaItem:mediaItem clearsPhotoMessageMapOnSuccessForKey:key];
+            }
+        }
+    }];
+}
+
+- (void)observeTyping {
+    FIRDatabaseReference *typingIndicatorRef = [self.channelRef child:@"typingIndicator"];
+    self.userIsTypingRef = [typingIndicatorRef child:_senderId];
+    [self.userIsTypingRef onDisconnectRemoveValue];
+    
+    [self.userIsTypingQuery observeEventType:FIRDataEventTypeValue withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
+        if (snapshot.childrenCount == 1 && self.isTyping) {
+            return;
+        }
+        
+        self.showTypingIndicator = snapshot.childrenCount > 0;
+        [self scrollToBottomAnimated:YES];
+    }];
+}
+
+- (BOOL)isTyping {
+    return _localTyping;
+}
+
+- (void)setIsTyping:(BOOL)isTyping {
+    _localTyping = isTyping;
+    
+    if (isTyping)
+        [self.userIsTypingRef setValue:@(1)];
+    else
+        [self.userIsTypingRef setValue:@(0)];
+}
+
+- (void)fetchImageDataAtURL:(NSString *)photoURL forMediaItem:(JSQPhotoMediaItem *)mediaItem clearsPhotoMessageMapOnSuccessForKey:(NSString *)key {
+    FIRStorageReference *storageRef = [[FIRStorage storage] referenceForURL:photoURL];
+    
+    __weak typeof(self) weakSelf = self;
+    [storageRef dataWithMaxSize:INT64_MAX completion:^(NSData * _Nullable data, NSError * _Nullable error) {
+        if (error) {
+            //Handle error
+            return;
+        }
+        
+        [storageRef metadataWithCompletion:^(FIRStorageMetadata * _Nullable metadata, NSError * _Nullable error) {
+            if (error) {
+                //Handle error
+                return;
+            }
+            if ([metadata.contentType isEqualToString:@"image/gif"]) {
+                mediaItem.image = [UIImage animatedImageWithAnimatedGIFData:data];
+            }
+            else {
+                mediaItem.image = [[UIImage alloc] initWithData:data];
+            }
+            
+            [weakSelf.collectionView reloadData];
+            
+            if (key == nil) {
+                return;
+            }
+            
+            [weakSelf.photoMessageMap removeObjectForKey:key];
+                
+        }];
+    }];
+}
+
+#pragma mark - UIPickerDelegate
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
+    
+    [picker dismissViewControllerAnimated:YES completion:NULL];
+    
+    NSURL *photoReferenceUrl = info[UIImagePickerControllerReferenceURL];
+    if (photoReferenceUrl) {
+        PHFetchResult *assets = [PHAsset fetchAssetsWithALAssetURLs:@[photoReferenceUrl] options:nil];
+        
+        PHAsset *asset =  assets.firstObject;
+        
+        NSString *key = [self sendPhotoMessage];
+        
+        if (key) {
+            [asset requestContentEditingInputWithOptions:nil completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
+                NSURL *imageFileURL = contentEditingInput.fullSizeImageURL;
+                
+                NSString *path = [NSString stringWithFormat:@"%@/%ld/%@", [FIRAuth auth].currentUser.uid,(long)([NSDate timeIntervalSinceReferenceDate] * 1000), photoReferenceUrl.lastPathComponent];
+                
+                [[self.storageRef child:path] putFile:imageFileURL metadata:nil completion:^(FIRStorageMetadata * _Nullable metadata, NSError * _Nullable error) {
+                    if (error) {
+                        //handle error
+                        return;
+                    }
+                    [self setImageURL:[self.storageRef child:metadata.path].description forMessageWithKey:key];
+                    
+                }];
+                
+            }];
+        }
+    }
+    else {
+        UIImage *image = info[UIImagePickerControllerOriginalImage];
+        
+        NSString *key = [self sendPhotoMessage];
+        
+        if (key) {
+            NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
+            
+            NSString *imagePath = [NSString stringWithFormat:@"%@/%ld.jpg", [FIRAuth auth].currentUser.uid, (long)[NSDate timeIntervalSinceReferenceDate] * 100];
+            
+            FIRStorageMetadata *metadata = [FIRStorageMetadata new];
+            metadata.contentType = @"image/jpeg";
+            
+            __weak typeof(self) weakSelf = self;
+            [[self.storageRef child:imagePath] putData:imageData metadata:metadata completion:^(FIRStorageMetadata * _Nullable metadata, NSError * _Nullable error) {
+                if (error) {
+                    //Handle error
+                    return;
+                }
+                
+                [weakSelf setImageURL:[weakSelf.storageRef child:metadata.path].description forMessageWithKey:key];
+            }];
+        }
+    }
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:NULL];
+}
+
+
+#pragma mark - dealloc
+
+- (void)dealloc
+{
+    if (self.newMessageRefHandle) {
+        [self.messageRef removeObserverWithHandle:self.newMessageRefHandle];
+    }
+    
+    if (self.updatedMessageRefHandle) {
+        [self.messageRef removeObserverWithHandle:self.updatedMessageRefHandle];
+    }
+    
+    [self jsq_registerForNotifications:NO];
+    
+    _collectionView.dataSource = nil;
+    _collectionView.delegate = nil;
+    
+    _inputToolbar.contentView.textView.delegate = nil;
+    _inputToolbar.delegate = nil;
 }
 
 @end

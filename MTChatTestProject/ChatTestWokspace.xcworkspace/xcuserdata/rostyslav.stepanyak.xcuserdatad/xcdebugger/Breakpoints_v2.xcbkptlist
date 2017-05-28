@@ -10,12 +10,92 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../../../Rostyslav.Stepanyak/Work/iOS/MTChat/MTChat/MTChat/JSQMessagesViewController/Controllers/JSQMessagesViewController.m"
-            timestampString = "517658547.227972"
+            timestampString = "517666155.702976"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "608"
-            endingLineNumber = "608"
+            startingLineNumber = "615"
+            endingLineNumber = "615"
             landmarkName = "-collectionView:didDeleteMessageAtIndexPath:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../Rostyslav.Stepanyak/Work/iOS/MTChat/MTChat/MTChat/JSQMessagesViewController/Controllers/JSQMessagesViewController.m"
+            timestampString = "517666649.160856"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1219"
+            endingLineNumber = "1219"
+            landmarkName = "-fetchImageDataAtURL:forMediaItem:clearsPhotoMessageMapOnSuccessForKey:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../Rostyslav.Stepanyak/Work/iOS/MTChat/MTChat/MTChat/JSQMessagesViewController/Controllers/JSQMessagesViewController.m"
+            timestampString = "517666649.160856"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1225"
+            endingLineNumber = "1225"
+            landmarkName = "-fetchImageDataAtURL:forMediaItem:clearsPhotoMessageMapOnSuccessForKey:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../Rostyslav.Stepanyak/Work/iOS/MTChat/MTChat/MTChat/JSQMessagesViewController/Controllers/JSQMessagesViewController.m"
+            timestampString = "517666649.160856"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1269"
+            endingLineNumber = "1269"
+            landmarkName = "-imagePickerController:didFinishPickingMediaWithInfo:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../Rostyslav.Stepanyak/Work/iOS/MTChat/MTChat/MTChat/JSQMessagesViewController/Controllers/JSQMessagesViewController.m"
+            timestampString = "517666649.160856"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1295"
+            endingLineNumber = "1295"
+            landmarkName = "-imagePickerController:didFinishPickingMediaWithInfo:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../Rostyslav.Stepanyak/Work/iOS/MTChat/MTChat/MTChat/JSQMessagesViewController/Controllers/JSQMessagesViewController.m"
+            timestampString = "517666649.160856"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1289"
+            endingLineNumber = "1289"
+            landmarkName = "-imagePickerController:didFinishPickingMediaWithInfo:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

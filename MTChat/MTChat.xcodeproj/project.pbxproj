@@ -118,6 +118,8 @@
 		47943CDB1ED9E0B0004F6B6A /* MTChatViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 47943CD91ED9E0B0004F6B6A /* MTChatViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		47943CDC1ED9E0B0004F6B6A /* MTChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 47943CDA1ED9E0B0004F6B6A /* MTChatViewController.m */; };
 		47943CDE1ED9E1B8004F6B6A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47943CDD1ED9E1B8004F6B6A /* GoogleService-Info.plist */; };
+		47CA82D31EDAE62C008222EA /* UIImage+animatedGIF.h in Headers */ = {isa = PBXBuildFile; fileRef = 47CA82D11EDAE62C008222EA /* UIImage+animatedGIF.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		47CA82D41EDAE62C008222EA /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 47CA82D21EDAE62C008222EA /* UIImage+animatedGIF.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -235,6 +237,8 @@
 		47943CD91ED9E0B0004F6B6A /* MTChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTChatViewController.h; sourceTree = "<group>"; };
 		47943CDA1ED9E0B0004F6B6A /* MTChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTChatViewController.m; sourceTree = "<group>"; };
 		47943CDD1ED9E1B8004F6B6A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		47CA82D11EDAE62C008222EA /* UIImage+animatedGIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+animatedGIF.h"; sourceTree = "<group>"; };
+		47CA82D21EDAE62C008222EA /* UIImage+animatedGIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+animatedGIF.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -319,6 +323,8 @@
 		47943BE11ED9D3F6004F6B6A /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				47CA82D11EDAE62C008222EA /* UIImage+animatedGIF.h */,
+				47CA82D21EDAE62C008222EA /* UIImage+animatedGIF.m */,
 				47943BE21ED9D3F6004F6B6A /* NSBundle+JSQMessages.h */,
 				47943BE31ED9D3F6004F6B6A /* NSBundle+JSQMessages.m */,
 				47943BE41ED9D3F6004F6B6A /* NSString+JSQMessages.h */,
@@ -526,6 +532,7 @@
 				47943C471ED9D3F6004F6B6A /* UIColor+JSQMessages.h in Headers */,
 				47943C741ED9D3F6004F6B6A /* JSQMessagesAvatarImage.h in Headers */,
 				47943C7A1ED9D3F6004F6B6A /* JSQMessagesViewAccessoryButtonDelegate.h in Headers */,
+				47CA82D31EDAE62C008222EA /* UIImage+animatedGIF.h in Headers */,
 				47943C731ED9D3F6004F6B6A /* JSQMessageMediaData.h in Headers */,
 				47943C711ED9D3F6004F6B6A /* JSQMessageBubbleImageDataSource.h in Headers */,
 				47943C541ED9D3F6004F6B6A /* JSQMessagesMediaViewBubbleImageMasker.h in Headers */,
@@ -660,6 +667,7 @@
 				47943C921ED9D3F7004F6B6A /* JSQMessagesLoadEarlierHeaderView.m in Sources */,
 				47943C6D1ED9D3F6004F6B6A /* JSQMediaItem.m in Sources */,
 				47943C4E1ED9D3F6004F6B6A /* JSQMessagesViewController.m in Sources */,
+				47CA82D41EDAE62C008222EA /* UIImage+animatedGIF.m in Sources */,
 				47943C841ED9D3F7004F6B6A /* JSQMessagesCollectionViewCell.m in Sources */,
 				47943C971ED9D3F7004F6B6A /* JSQMessagesToolbarContentView.m in Sources */,
 				47943C801ED9D3F6004F6B6A /* JSQMessagesCellTextView.m in Sources */,
