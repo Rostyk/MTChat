@@ -1,0 +1,7 @@
+MTChatTest.xcodeproj/project.xcworkspace/xcuserdata
+MTChatTest.xcodeproj/xcuserdata
+MTChatTest.xcworkspace/xcuserdata
+Pods
+*.xcscmblueprint
+.gradle
+.DS_Store
