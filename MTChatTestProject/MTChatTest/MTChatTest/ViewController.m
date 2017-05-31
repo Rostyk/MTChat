@@ -23,7 +23,7 @@
     chatViewController.channelId = @"hockey";
     chatViewController.senderId = @"user2";
     chatViewController.ownAvatarURL = @"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRE6Jn-YODWU_Ra92q8sEQdFdlB1D6FBePwNhr3PeCAgPzuZugt";
-    chatViewController.senderAvatarURL = @"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwSQJ7mzN7EwBJtakY040DVy4MEs9jQXVe92jc1m1JVWZtnSzO";
+    chatViewController.senderAvatarURL = @"https://images-na.ssl-images-amazon.com/images/M/MV5BNzQzNDMxMjQxNF5BMl5BanBnXkFtZTYwMTc5NTI2._V1_UY317_CR7,0,214,317_AL_.jpg";
     
     [self.navigationController pushViewController:chatViewController animated:YES];
 

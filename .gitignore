@@ -1,0 +1,7 @@
+DarkMailiOS.xcodeproj/project.xcworkspace/xcuserdata
+DarkMailiOS.xcodeproj/xcuserdata
+DarkMailiOS.xcworkspace/xcuserdata
+Pods
+*.xcscmblueprint
+.gradle
+.DS_Store
