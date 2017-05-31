@@ -35,6 +35,27 @@ NS_ASSUME_NONNULL_BEGIN
                                                          UITextViewDelegate>
 
 /**
+ *  Your own avatar URL
+ */
+@property (nonatomic, strong) NSString *senderAvatarURL;
+
+/**
+ *  Your own avatar image
+ */
+@property (nonatomic, strong) UIImage *senderAvatarImage;
+
+
+/**
+ *  Your own avatar URL
+ */
+@property (nonatomic, strong) NSString *ownAvatarURL;
+
+/**
+ *  Your own avatar image
+ */
+@property (nonatomic, strong) UIImage *ownAvatarImage;
+
+/**
  *  Channel id string (check the firebase database structure)
  */
 @property (nonatomic, strong) NSString *channelId;

@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4771B1481EDEC25C004810D5 /* Nullability.h in Headers */ = {isa = PBXBuildFile; fileRef = 4771B1411EDEC25C004810D5 /* Nullability.h */; };
+		4771B1491EDEC25C004810D5 /* PINCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 4771B1421EDEC25C004810D5 /* PINCache.h */; };
+		4771B14A1EDEC25C004810D5 /* PINCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 4771B1431EDEC25C004810D5 /* PINCache.m */; };
+		4771B14B1EDEC25C004810D5 /* PINDiskCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 4771B1441EDEC25C004810D5 /* PINDiskCache.h */; };
+		4771B14C1EDEC25C004810D5 /* PINDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 4771B1451EDEC25C004810D5 /* PINDiskCache.m */; };
+		4771B14D1EDEC25C004810D5 /* PINMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 4771B1461EDEC25C004810D5 /* PINMemoryCache.h */; };
+		4771B14E1EDEC25C004810D5 /* PINMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 4771B1471EDEC25C004810D5 /* PINMemoryCache.m */; };
 		47943BD81ED9D203004F6B6A /* MTChat.h in Headers */ = {isa = PBXBuildFile; fileRef = 47943BD61ED9D203004F6B6A /* MTChat.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		47943C421ED9D3F6004F6B6A /* JSQMessagesAssets.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 47943BE01ED9D3F6004F6B6A /* JSQMessagesAssets.bundle */; };
 		47943C431ED9D3F6004F6B6A /* NSBundle+JSQMessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 47943BE21ED9D3F6004F6B6A /* NSBundle+JSQMessages.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -120,9 +127,28 @@
 		47943CDE1ED9E1B8004F6B6A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 47943CDD1ED9E1B8004F6B6A /* GoogleService-Info.plist */; };
 		47CA82D31EDAE62C008222EA /* UIImage+animatedGIF.h in Headers */ = {isa = PBXBuildFile; fileRef = 47CA82D11EDAE62C008222EA /* UIImage+animatedGIF.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		47CA82D41EDAE62C008222EA /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 47CA82D21EDAE62C008222EA /* UIImage+animatedGIF.m */; };
+		47DB5C471EDED16F00DBF70D /* JTSAnimatedGIFUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 47DB5C3B1EDED16F00DBF70D /* JTSAnimatedGIFUtility.h */; };
+		47DB5C481EDED16F00DBF70D /* JTSAnimatedGIFUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 47DB5C3C1EDED16F00DBF70D /* JTSAnimatedGIFUtility.m */; };
+		47DB5C491EDED16F00DBF70D /* JTSImageInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 47DB5C3D1EDED16F00DBF70D /* JTSImageInfo.h */; };
+		47DB5C4A1EDED16F00DBF70D /* JTSImageInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 47DB5C3E1EDED16F00DBF70D /* JTSImageInfo.m */; };
+		47DB5C4B1EDED16F00DBF70D /* JTSImageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 47DB5C3F1EDED16F00DBF70D /* JTSImageViewController.h */; };
+		47DB5C4C1EDED16F00DBF70D /* JTSImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 47DB5C401EDED16F00DBF70D /* JTSImageViewController.m */; };
+		47DB5C4D1EDED16F00DBF70D /* JTSSimpleImageDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 47DB5C411EDED16F00DBF70D /* JTSSimpleImageDownloader.h */; };
+		47DB5C4E1EDED16F00DBF70D /* JTSSimpleImageDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 47DB5C421EDED16F00DBF70D /* JTSSimpleImageDownloader.m */; };
+		47DB5C4F1EDED16F00DBF70D /* UIApplication+JTSImageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 47DB5C431EDED16F00DBF70D /* UIApplication+JTSImageViewController.h */; };
+		47DB5C501EDED16F00DBF70D /* UIApplication+JTSImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 47DB5C441EDED16F00DBF70D /* UIApplication+JTSImageViewController.m */; };
+		47DB5C511EDED16F00DBF70D /* UIImage+JTSImageEffects.h in Headers */ = {isa = PBXBuildFile; fileRef = 47DB5C451EDED16F00DBF70D /* UIImage+JTSImageEffects.h */; };
+		47DB5C521EDED16F00DBF70D /* UIImage+JTSImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = 47DB5C461EDED16F00DBF70D /* UIImage+JTSImageEffects.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4771B1411EDEC25C004810D5 /* Nullability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nullability.h; sourceTree = "<group>"; };
+		4771B1421EDEC25C004810D5 /* PINCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINCache.h; sourceTree = "<group>"; };
+		4771B1431EDEC25C004810D5 /* PINCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINCache.m; sourceTree = "<group>"; };
+		4771B1441EDEC25C004810D5 /* PINDiskCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINDiskCache.h; sourceTree = "<group>"; };
+		4771B1451EDEC25C004810D5 /* PINDiskCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINDiskCache.m; sourceTree = "<group>"; };
+		4771B1461EDEC25C004810D5 /* PINMemoryCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINMemoryCache.h; sourceTree = "<group>"; };
+		4771B1471EDEC25C004810D5 /* PINMemoryCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINMemoryCache.m; sourceTree = "<group>"; };
 		47943BD31ED9D203004F6B6A /* MTChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MTChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		47943BD61ED9D203004F6B6A /* MTChat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTChat.h; sourceTree = "<group>"; };
 		47943BD71ED9D203004F6B6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -239,6 +265,18 @@
 		47943CDD1ED9E1B8004F6B6A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		47CA82D11EDAE62C008222EA /* UIImage+animatedGIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+animatedGIF.h"; sourceTree = "<group>"; };
 		47CA82D21EDAE62C008222EA /* UIImage+animatedGIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+animatedGIF.m"; sourceTree = "<group>"; };
+		47DB5C3B1EDED16F00DBF70D /* JTSAnimatedGIFUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTSAnimatedGIFUtility.h; sourceTree = "<group>"; };
+		47DB5C3C1EDED16F00DBF70D /* JTSAnimatedGIFUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JTSAnimatedGIFUtility.m; sourceTree = "<group>"; };
+		47DB5C3D1EDED16F00DBF70D /* JTSImageInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTSImageInfo.h; sourceTree = "<group>"; };
+		47DB5C3E1EDED16F00DBF70D /* JTSImageInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JTSImageInfo.m; sourceTree = "<group>"; };
+		47DB5C3F1EDED16F00DBF70D /* JTSImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTSImageViewController.h; sourceTree = "<group>"; };
+		47DB5C401EDED16F00DBF70D /* JTSImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JTSImageViewController.m; sourceTree = "<group>"; };
+		47DB5C411EDED16F00DBF70D /* JTSSimpleImageDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTSSimpleImageDownloader.h; sourceTree = "<group>"; };
+		47DB5C421EDED16F00DBF70D /* JTSSimpleImageDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JTSSimpleImageDownloader.m; sourceTree = "<group>"; };
+		47DB5C431EDED16F00DBF70D /* UIApplication+JTSImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication+JTSImageViewController.h"; sourceTree = "<group>"; };
+		47DB5C441EDED16F00DBF70D /* UIApplication+JTSImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication+JTSImageViewController.m"; sourceTree = "<group>"; };
+		47DB5C451EDED16F00DBF70D /* UIImage+JTSImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+JTSImageEffects.h"; sourceTree = "<group>"; };
+		47DB5C461EDED16F00DBF70D /* UIImage+JTSImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+JTSImageEffects.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -267,6 +305,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		471574CD1EDD6F0500ACBE64 /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				4771B1411EDEC25C004810D5 /* Nullability.h */,
+				4771B1421EDEC25C004810D5 /* PINCache.h */,
+				4771B1431EDEC25C004810D5 /* PINCache.m */,
+				4771B1441EDEC25C004810D5 /* PINDiskCache.h */,
+				4771B1451EDEC25C004810D5 /* PINDiskCache.m */,
+				4771B1461EDEC25C004810D5 /* PINMemoryCache.h */,
+				4771B1471EDEC25C004810D5 /* PINMemoryCache.m */,
+			);
+			path = Cache;
+			sourceTree = "<group>";
+		};
 		47943BC91ED9D203004F6B6A = {
 			isa = PBXGroup;
 			children = (
@@ -300,6 +352,8 @@
 		47943BDE1ED9D3F6004F6B6A /* JSQMessagesViewController */ = {
 			isa = PBXGroup;
 			children = (
+				47DB5C3A1EDED16F00DBF70D /* FullScreenImage */,
+				471574CD1EDD6F0500ACBE64 /* Cache */,
 				47943BDF1ED9D3F6004F6B6A /* Assets */,
 				47943BE11ED9D3F6004F6B6A /* Categories */,
 				47943BEC1ED9D3F6004F6B6A /* Controllers */,
@@ -517,6 +571,25 @@
 			path = ViewController;
 			sourceTree = "<group>";
 		};
+		47DB5C3A1EDED16F00DBF70D /* FullScreenImage */ = {
+			isa = PBXGroup;
+			children = (
+				47DB5C3B1EDED16F00DBF70D /* JTSAnimatedGIFUtility.h */,
+				47DB5C3C1EDED16F00DBF70D /* JTSAnimatedGIFUtility.m */,
+				47DB5C3D1EDED16F00DBF70D /* JTSImageInfo.h */,
+				47DB5C3E1EDED16F00DBF70D /* JTSImageInfo.m */,
+				47DB5C3F1EDED16F00DBF70D /* JTSImageViewController.h */,
+				47DB5C401EDED16F00DBF70D /* JTSImageViewController.m */,
+				47DB5C411EDED16F00DBF70D /* JTSSimpleImageDownloader.h */,
+				47DB5C421EDED16F00DBF70D /* JTSSimpleImageDownloader.m */,
+				47DB5C431EDED16F00DBF70D /* UIApplication+JTSImageViewController.h */,
+				47DB5C441EDED16F00DBF70D /* UIApplication+JTSImageViewController.m */,
+				47DB5C451EDED16F00DBF70D /* UIImage+JTSImageEffects.h */,
+				47DB5C461EDED16F00DBF70D /* UIImage+JTSImageEffects.m */,
+			);
+			path = FullScreenImage;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -536,12 +609,16 @@
 				47943C731ED9D3F6004F6B6A /* JSQMessageMediaData.h in Headers */,
 				47943C711ED9D3F6004F6B6A /* JSQMessageBubbleImageDataSource.h in Headers */,
 				47943C541ED9D3F6004F6B6A /* JSQMessagesMediaViewBubbleImageMasker.h in Headers */,
+				47DB5C491EDED16F00DBF70D /* JTSImageInfo.h in Headers */,
+				47DB5C4B1EDED16F00DBF70D /* JTSImageViewController.h in Headers */,
 				47943C7B1ED9D3F6004F6B6A /* JSQPhotoMediaItem.h in Headers */,
 				47943C6E1ED9D3F6004F6B6A /* JSQMessage.h in Headers */,
 				47943C451ED9D3F6004F6B6A /* NSString+JSQMessages.h in Headers */,
+				47DB5C4F1EDED16F00DBF70D /* UIApplication+JTSImageViewController.h in Headers */,
 				47943C621ED9D3F6004F6B6A /* JSQMessagesCollectionViewFlowLayout.h in Headers */,
 				47943C661ED9D3F6004F6B6A /* JSQMessagesCollectionViewLayoutAttributes.h in Headers */,
 				47943C961ED9D3F7004F6B6A /* JSQMessagesToolbarContentView.h in Headers */,
+				4771B14D1EDEC25C004810D5 /* PINMemoryCache.h in Headers */,
 				47943C561ED9D3F6004F6B6A /* JSQMessagesTimestampFormatter.h in Headers */,
 				47943C8B1ED9D3F7004F6B6A /* JSQMessagesComposerTextView.h in Headers */,
 				47943C761ED9D3F6004F6B6A /* JSQMessagesBubbleImage.h in Headers */,
@@ -550,10 +627,14 @@
 				47943C5A1ED9D3F6004F6B6A /* JSQMessagesVideoThumbnailFactory.h in Headers */,
 				47943C851ED9D3F7004F6B6A /* JSQMessagesCollectionViewCellIncoming.h in Headers */,
 				47943C5D1ED9D3F6004F6B6A /* JSQAudioMediaViewAttributes.h in Headers */,
+				47DB5C471EDED16F00DBF70D /* JTSAnimatedGIFUtility.h in Headers */,
 				47943C941ED9D3F7004F6B6A /* JSQMessagesMediaPlaceholderView.h in Headers */,
 				47943C641ED9D3F6004F6B6A /* JSQMessagesCollectionViewFlowLayoutInvalidationContext.h in Headers */,
 				47943C7D1ED9D3F6004F6B6A /* JSQVideoMediaItem.h in Headers */,
 				47943C491ED9D3F6004F6B6A /* UIImage+JSQMessages.h in Headers */,
+				4771B1481EDEC25C004810D5 /* Nullability.h in Headers */,
+				4771B1491EDEC25C004810D5 /* PINCache.h in Headers */,
+				4771B14B1EDEC25C004810D5 /* PINDiskCache.h in Headers */,
 				47943C4B1ED9D3F6004F6B6A /* UIView+JSQMessages.h in Headers */,
 				47943C6C1ED9D3F6004F6B6A /* JSQMediaItem.h in Headers */,
 				47943C781ED9D3F6004F6B6A /* JSQMessagesCollectionViewDataSource.h in Headers */,
@@ -563,6 +644,7 @@
 				47943C881ED9D3F7004F6B6A /* JSQMessagesCollectionViewCellOutgoing.h in Headers */,
 				47943C4D1ED9D3F6004F6B6A /* JSQMessagesViewController.h in Headers */,
 				47943C8F1ED9D3F7004F6B6A /* JSQMessagesLabel.h in Headers */,
+				47DB5C511EDED16F00DBF70D /* UIImage+JTSImageEffects.h in Headers */,
 				47943C5F1ED9D3F6004F6B6A /* JSQMessagesBubbleSizeCalculating.h in Headers */,
 				47943C8D1ED9D3F7004F6B6A /* JSQMessagesInputToolbar.h in Headers */,
 				47943C5C1ED9D3F6004F6B6A /* JSQMessages.h in Headers */,
@@ -570,6 +652,7 @@
 				47943C831ED9D3F7004F6B6A /* JSQMessagesCollectionViewCell.h in Headers */,
 				47943CDB1ED9E0B0004F6B6A /* MTChatViewController.h in Headers */,
 				47943C521ED9D3F6004F6B6A /* JSQMessagesBubbleImageFactory.h in Headers */,
+				47DB5C4D1EDED16F00DBF70D /* JTSSimpleImageDownloader.h in Headers */,
 				47943C6A1ED9D3F6004F6B6A /* JSQLocationMediaItem.h in Headers */,
 				47943C7F1ED9D3F6004F6B6A /* JSQMessagesCellTextView.h in Headers */,
 				47943C721ED9D3F6004F6B6A /* JSQMessageData.h in Headers */,
@@ -655,14 +738,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				47943C461ED9D3F6004F6B6A /* NSString+JSQMessages.m in Sources */,
+				47DB5C501EDED16F00DBF70D /* UIApplication+JTSImageViewController.m in Sources */,
 				47943C7E1ED9D3F6004F6B6A /* JSQVideoMediaItem.m in Sources */,
+				4771B14E1EDEC25C004810D5 /* PINMemoryCache.m in Sources */,
 				47943C9D1ED9D3F7004F6B6A /* JSQMessagesTypingView.m in Sources */,
 				47943C551ED9D3F6004F6B6A /* JSQMessagesMediaViewBubbleImageMasker.m in Sources */,
 				47943C821ED9D3F6004F6B6A /* JSQMessagesCollectionView.m in Sources */,
 				47943C571ED9D3F6004F6B6A /* JSQMessagesTimestampFormatter.m in Sources */,
+				47DB5C521EDED16F00DBF70D /* UIImage+JTSImageEffects.m in Sources */,
 				47943C6F1ED9D3F6004F6B6A /* JSQMessage.m in Sources */,
 				47943C631ED9D3F6004F6B6A /* JSQMessagesCollectionViewFlowLayout.m in Sources */,
 				47943C6B1ED9D3F6004F6B6A /* JSQLocationMediaItem.m in Sources */,
+				4771B14C1EDEC25C004810D5 /* PINDiskCache.m in Sources */,
 				47943C611ED9D3F6004F6B6A /* JSQMessagesBubblesSizeCalculator.m in Sources */,
 				47943C921ED9D3F7004F6B6A /* JSQMessagesLoadEarlierHeaderView.m in Sources */,
 				47943C6D1ED9D3F6004F6B6A /* JSQMediaItem.m in Sources */,
@@ -672,20 +759,25 @@
 				47943C971ED9D3F7004F6B6A /* JSQMessagesToolbarContentView.m in Sources */,
 				47943C801ED9D3F6004F6B6A /* JSQMessagesCellTextView.m in Sources */,
 				47943C951ED9D3F7004F6B6A /* JSQMessagesMediaPlaceholderView.m in Sources */,
+				47DB5C4A1EDED16F00DBF70D /* JTSImageInfo.m in Sources */,
 				47943C481ED9D3F6004F6B6A /* UIColor+JSQMessages.m in Sources */,
 				47943C511ED9D3F6004F6B6A /* JSQMessagesAvatarImageFactory.m in Sources */,
 				47943C5B1ED9D3F6004F6B6A /* JSQMessagesVideoThumbnailFactory.m in Sources */,
 				47943C5E1ED9D3F6004F6B6A /* JSQAudioMediaViewAttributes.m in Sources */,
 				47943C8C1ED9D3F7004F6B6A /* JSQMessagesComposerTextView.m in Sources */,
 				47943C861ED9D3F7004F6B6A /* JSQMessagesCollectionViewCellIncoming.m in Sources */,
+				4771B14A1EDEC25C004810D5 /* PINCache.m in Sources */,
 				47943C7C1ED9D3F6004F6B6A /* JSQPhotoMediaItem.m in Sources */,
+				47DB5C481EDED16F00DBF70D /* JTSAnimatedGIFUtility.m in Sources */,
 				47943C4A1ED9D3F6004F6B6A /* UIImage+JSQMessages.m in Sources */,
 				47943C4C1ED9D3F6004F6B6A /* UIView+JSQMessages.m in Sources */,
 				47943C901ED9D3F7004F6B6A /* JSQMessagesLabel.m in Sources */,
 				47943C771ED9D3F6004F6B6A /* JSQMessagesBubbleImage.m in Sources */,
+				47DB5C4C1EDED16F00DBF70D /* JTSImageViewController.m in Sources */,
 				47943C441ED9D3F6004F6B6A /* NSBundle+JSQMessages.m in Sources */,
 				47943C9A1ED9D3F7004F6B6A /* JSQMessagesTypingIndicatorFooterView.m in Sources */,
 				47943C651ED9D3F6004F6B6A /* JSQMessagesCollectionViewFlowLayoutInvalidationContext.m in Sources */,
+				47DB5C4E1EDED16F00DBF70D /* JTSSimpleImageDownloader.m in Sources */,
 				47943C531ED9D3F6004F6B6A /* JSQMessagesBubbleImageFactory.m in Sources */,
 				47943C891ED9D3F7004F6B6A /* JSQMessagesCollectionViewCellOutgoing.m in Sources */,
 				47943C591ED9D3F6004F6B6A /* JSQMessagesToolbarButtonFactory.m in Sources */,

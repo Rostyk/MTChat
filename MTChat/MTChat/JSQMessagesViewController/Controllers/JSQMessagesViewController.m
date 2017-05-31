@@ -18,7 +18,7 @@
 
 #import "JSQMessagesViewController.h"
 #import "JSQMessagesCollectionViewFlowLayoutInvalidationContext.h"
-
+#import "JSQMessagesAvatarImageFactory.h"
 #import "UIImage+animatedGIF.h"
 #import "JSQPhotoMediaItem.h"
 #import "JSQMessage.h"
@@ -41,7 +41,8 @@
 #import <FirebaseCore/FirebaseCore.h>
 #import <FirebaseAuth/FirebaseAuth.h>
 #import <FirebaseDatabase/FirebaseDatabase.h>
-
+#import "JTSImageViewController.h"
+#import "PINCache.h"
 #import <Photos/Photos.h>
 #import <objc/runtime.h>
 
@@ -143,6 +144,8 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 @property (nonatomic) FIRDatabaseHandle updatedMessageRefHandle;
 @property (nonatomic, strong) FIRStorageReference *storageRef;
 @property (nonatomic, strong) NSMutableDictionary *photoMessageMap;
+
+@property (nonatomic, strong) JSQMessagesAvatarImageFactory *avatarImageFactory;
 @end
 
 
@@ -180,6 +183,14 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 }
 
 #pragma mark - access overrides
+
+- (JSQMessagesAvatarImageFactory *)avatarImageFactory {
+    if (!_avatarImageFactory) {
+        _avatarImageFactory = [[JSQMessagesAvatarImageFactory alloc] initWithDiameter:_collectionView.collectionViewLayout.outgoingAvatarViewSize.width];
+    }
+    
+    return _avatarImageFactory;
+}
 
 - (NSMutableDictionary *)photoMessageMap {
     if (!_photoMessageMap) {
@@ -358,23 +369,62 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     [self jsq_configureMessagesViewController];
     [self jsq_registerForNotifications:YES];
     
-    _collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
-    _collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
-    [self authenticate];
+    _collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeMake(32, 32);
+    _collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeMake(32, 32);
+    [self setup];
 }
 
-- (void)authenticate {
-    [FIRApp configure];
+- (void)setup {
     __weak typeof(self) weakSelf = self;
+    
+    dispatch_group_t group = dispatch_group_create();
+    
+    dispatch_group_enter(group);
+    [FIRApp configure];
     [[FIRAuth auth] signInAnonymouslyWithCompletion:^(FIRUser * _Nullable user, NSError * _Nullable error) {
         if (error) {
             //handle the error
         }
-        else {
+        
+        dispatch_group_leave(group);
+    }];
+    
+    if (self.ownAvatarURL) {
+        dispatch_group_enter(group);
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSURL *url = [NSURL URLWithString:self.ownAvatarURL];
+            NSData *data = [NSData dataWithContentsOfURL:url];
+            UIImage *img = [[UIImage alloc] initWithData:data];
+            weakSelf.ownAvatarImage = img;
+            
+            dispatch_group_leave(group);
+        });
+    }
+    else if (!self.ownAvatarImage) {
+        self.ownAvatarImage = [UIImage imageNamed:@"chat_placeholder"];
+    }
+    
+    if (self.senderAvatarURL) {
+        dispatch_group_enter(group);
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSURL *url = [NSURL URLWithString:self.senderAvatarURL];
+            NSData *data = [NSData dataWithContentsOfURL:url];
+            UIImage *img = [[UIImage alloc] initWithData:data];
+            weakSelf.senderAvatarImage = img;
+            
+            dispatch_group_leave(group);
+        });
+    }
+    else if (!self.senderAvatarImage) {
+        self.senderAvatarImage = [UIImage imageNamed:@"chat_placeholder"];
+    }
+    
+    dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             [weakSelf observeMessages];
             [weakSelf observeTyping];
-        }
-    }];
+        });
+    });
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -628,7 +678,18 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
 - (id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    return nil;
+    NSUInteger index = indexPath.item;
+    NSString *previous = index == 0 ? @"" : ((JSQMessage *)(self.messages[index - 1])).senderId;
+    NSString *current = ((JSQMessage *)self.messages[index]).senderId;
+    
+    JSQMessage *message = self.messages[indexPath.row];
+    
+    if ([message.senderId isEqualToString:_senderId]) {
+        return [previous isEqualToString:current] ? nil : [self.avatarImageFactory avatarImageWithImage:self.ownAvatarImage];
+    }
+    else {
+        return [previous isEqualToString:current] ? nil : [self.avatarImageFactory avatarImageWithImage:self.senderAvatarImage];
+    }
 }
 
 - (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForCellTopLabelAtIndexPath:(NSIndexPath *)indexPath
@@ -896,11 +957,45 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
  didTapAvatarImageView:(UIImageView *)avatarImageView
            atIndexPath:(NSIndexPath *)indexPath { }
 
-- (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapMessageBubbleAtIndexPath:(NSIndexPath *)indexPath { }
+- (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapMessageBubbleAtIndexPath:(NSIndexPath *)indexPath {
+    JSQMessage *message = [self.messages objectAtIndex:indexPath.row];
+    
+    if (message.isMediaMessage) {
+        id<JSQMessageMediaData> mediaItem = message.media;
+        
+        if ([mediaItem isKindOfClass:[JSQPhotoMediaItem class]]) {
+            
+            NSLog(@"Tapped photo message bubble!");
+            
+            JSQPhotoMediaItem *photoItem = (JSQPhotoMediaItem *)mediaItem;
+            UICollectionViewCell *cell = [self.collectionView cellForItemAtIndexPath:indexPath];
+            [self popupImage:photoItem.image cell:cell];
+        }
+    }
+}
 
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView
  didTapCellAtIndexPath:(NSIndexPath *)indexPath
          touchLocation:(CGPoint)touchLocation { }
+
+#pragma mark - full screen image
+
+- (void)popupImage: (UIImage*)image cell:(UICollectionViewCell *)cell{
+    // Create image info
+    JTSImageInfo *imageInfo = [[JTSImageInfo alloc] init];
+    imageInfo.image = image;
+    imageInfo.referenceRect = cell.frame;
+    imageInfo.referenceView = self.collectionView;
+    
+    // Setup view controller
+    JTSImageViewController *imageViewer = [[JTSImageViewController alloc]
+                                           initWithImageInfo:imageInfo
+                                           mode:JTSImageViewControllerMode_Image
+                                           backgroundStyle:JTSImageViewControllerBackgroundOption_None];
+    
+    // Present the view controller.
+    [imageViewer showFromViewController:self transition:JTSImageViewControllerTransition_FromOriginalPosition];
+}
 
 #pragma mark - Input toolbar delegate
 
@@ -1156,7 +1251,8 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
             
             if ([photoURL hasPrefix:@"gs://"]) {
                 [self fetchImageDataAtURL:photoURL
-                             forMediaItem:mediaItem clearsPhotoMessageMapOnSuccessForKey:nil];
+                             forMediaItem:mediaItem clearsPhotoMessageMapOnSuccessForKey:nil
+                                indexPath:[NSIndexPath indexPathForRow:self.messages.count-1 inSection:0]];
             }
             
             [self finishSendingMessage];
@@ -1176,7 +1272,8 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
             JSQPhotoMediaItem *mediaItem = [self.photoMessageMap objectForKey:key];
             if (mediaItem) {
                 [self fetchImageDataAtURL:photoURL
-                             forMediaItem:mediaItem clearsPhotoMessageMapOnSuccessForKey:key];
+                             forMediaItem:mediaItem clearsPhotoMessageMapOnSuccessForKey:key
+                                indexPath:nil];
             }
         }
     }];
@@ -1210,7 +1307,34 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
         [self.userIsTypingRef setValue:@(0)];
 }
 
-- (void)fetchImageDataAtURL:(NSString *)photoURL forMediaItem:(JSQPhotoMediaItem *)mediaItem clearsPhotoMessageMapOnSuccessForKey:(NSString *)key {
+- (void)fetchImageDataAtURL:(NSString *)photoURL forMediaItem:(JSQPhotoMediaItem *)mediaItem clearsPhotoMessageMapOnSuccessForKey:(NSString *)key indexPath:(NSIndexPath *)indexPath{
+    
+    __weak typeof(self) weakSelf = self;
+    [[PINCache sharedCache]
+     objectForKey:photoURL
+            block:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+                    if (object) {
+                        UIImage *image = (UIImage *)object;
+                        mediaItem.image = image;
+                        
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (indexPath)
+                                [weakSelf.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+                            else
+                                [weakSelf.collectionView reloadData];
+                        });
+                        
+                        
+                        [weakSelf.photoMessageMap removeObjectForKey:key];
+                    }
+                    else {
+                        [weakSelf downloadPhoto:photoURL
+                                   forMediaItem:mediaItem clearsPhotoMessageMapOnSuccessForKey:key];
+                    }
+    }];
+}
+
+- (void)downloadPhoto:(NSString *)photoURL forMediaItem:(JSQPhotoMediaItem *)mediaItem clearsPhotoMessageMapOnSuccessForKey:(NSString *)key  {
     FIRStorageReference *storageRef = [[FIRStorage storage] referenceForURL:photoURL];
     
     __weak typeof(self) weakSelf = self;
@@ -1231,7 +1355,7 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
             else {
                 mediaItem.image = [[UIImage alloc] initWithData:data];
             }
-            
+            [[PINCache sharedCache] setObject:mediaItem.image forKey:photoURL];
             [weakSelf.collectionView reloadData];
             
             if (key == nil) {
@@ -1239,9 +1363,9 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
             }
             
             [weakSelf.photoMessageMap removeObjectForKey:key];
-                
         }];
     }];
+
 }
 
 #pragma mark - UIPickerDelegate
