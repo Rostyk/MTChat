@@ -15,10 +15,20 @@ Maliwan chat backed back-ended with Firebase.
  ![alt text](https://www.dropbox.com/s/3evc6bqqq4dhtsd/mtchattestproj.png?dl=1)
  
 <br>
+ * Make sure to mark "copy items if needed":
+ 
+ ![alt text](https://www.dropbox.com/s/vr8i48p7lbsqm8s/addframewok.png?dl=1)
 
+ * Make sure you added the framework into "Embedded frameworks" section in "General" tab of the target.
+ 
+ ![alt text](https://www.dropbox.com/s/9q8bt316hn3prf2/embeddedframeworks.png?dl=1)
+ <br>
+ 
+ ![alt text](https://www.dropbox.com/s/a2e5eg8ohzd1473/frameworkadded.png?dl=1)
+ 
 2. Subclass from main chat view controller:
  ```
- @class MTChatViewController;
+ @import MTChat;
  
  @interface MyChatViewController : MTChatViewController {
  }
@@ -31,8 +41,6 @@ Maliwan chat backed back-ended with Firebase.
 
 ```
 #import "MyChatViewController.h"
-
-@import MTChat;
 
 @implementation MyChatViewController
 
