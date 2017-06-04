@@ -1,0 +1,5 @@
+ChatTestWokspace.xcworkspace/xcuserdatad
+Pods
+*.xcscmblueprint
+.gradle
+.DS_Store

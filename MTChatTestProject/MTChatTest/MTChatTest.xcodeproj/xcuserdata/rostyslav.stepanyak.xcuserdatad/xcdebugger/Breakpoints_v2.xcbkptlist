@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../../../../Rostyslav.Stepanyak/Work/iOS/MTChat/MTChat/MTChat/JSQMessagesViewController/Controllers/JSQMessagesViewController.m"
-            timestampString = "517923005.327209"
+            timestampString = "518193679.070214"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1338"
-            endingLineNumber = "1338"
+            startingLineNumber = "1353"
+            endingLineNumber = "1353"
             landmarkName = "-downloadPhoto:forMediaItem:clearsPhotoMessageMapOnSuccessForKey:"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../../../../Rostyslav.Stepanyak/Work/iOS/MTChat/MTChat/MTChat/JSQMessagesViewController/Controllers/JSQMessagesViewController.m"
-            timestampString = "517923005.327209"
+            timestampString = "518193679.070214"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1358"
-            endingLineNumber = "1358"
+            startingLineNumber = "1373"
+            endingLineNumber = "1373"
             landmarkName = "-downloadPhoto:forMediaItem:clearsPhotoMessageMapOnSuccessForKey:"
             landmarkType = "7">
          </BreakpointContent>

@@ -46,6 +46,7 @@
 #import <Photos/Photos.h>
 #import <objc/runtime.h>
 
+#define     CHAT_ERROR_DOMAIN            @"MTChatDomain"
 #define     imageURLNotSetKey            @"NOTSET"
 
 // Fixes rdar://26295020
@@ -139,7 +140,7 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 @property (nonatomic, strong) FIRDatabaseQuery *userIsTypingQuery;
 @property (nonatomic) BOOL localTyping;
 @property (nonatomic) BOOL isTyping;
-
+@property (nonatomic) BOOL alreadyLoaded;
 @property (nonatomic) FIRDatabaseHandle newMessageRefHandle;
 @property (nonatomic) FIRDatabaseHandle updatedMessageRefHandle;
 @property (nonatomic, strong) FIRStorageReference *storageRef;
@@ -1227,8 +1228,12 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     self.channelRef = [[[[FIRDatabase database] reference] child:@"channels"] child:_channelId];
     self.messageRef = [self.channelRef child:@"messages"];
     
+    __weak  typeof(self) weakSelf = self;
     FIRDatabaseQuery *messageQuery = [self.messageRef queryLimitedToLast:25];
+    
     self.newMessageRefHandle = [messageQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
+        
+        [weakSelf fireChatLoaded];
         
         NSDictionary *messageData = snapshot.value;
         
@@ -1237,28 +1242,31 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
         NSString *text = messageData[@"text"];
         
         if (senderId && senderName && text && text.length > 0) {
-            [self addMessage:senderId
+            [weakSelf addMessage:senderId
                         name:senderName
                         text:text];
-            [self finishReceivingMessage];
+            [weakSelf finishReceivingMessage];
             
         }
         else if (senderId){
             NSString *photoURL = messageData[@"photoURL"];
-            JSQPhotoMediaItem *mediaItem = [[JSQPhotoMediaItem alloc] initWithMaskAsOutgoing: [senderId isEqualToString:self.senderId]];
+            JSQPhotoMediaItem *mediaItem = [[JSQPhotoMediaItem alloc] initWithMaskAsOutgoing: [senderId isEqualToString:weakSelf.senderId]];
             
-            [self addPhotoMessage:senderId key:snapshot.key mediaItem:mediaItem];
+            [weakSelf addPhotoMessage:senderId key:snapshot.key mediaItem:mediaItem];
             
             if ([photoURL hasPrefix:@"gs://"]) {
-                [self fetchImageDataAtURL:photoURL
+                [weakSelf fetchImageDataAtURL:photoURL
                              forMediaItem:mediaItem clearsPhotoMessageMapOnSuccessForKey:nil
-                                indexPath:[NSIndexPath indexPathForRow:self.messages.count-1 inSection:0]];
+                                indexPath:[NSIndexPath indexPathForRow:weakSelf.messages.count-1 inSection:0]];
             }
             
-            [self finishSendingMessage];
+            [weakSelf finishSendingMessage];
         }
         else {
-            //Error
+            NSError *error = [NSError errorWithDomain:CHAT_ERROR_DOMAIN
+                                                 code:-1
+                                             userInfo:@{@"error" : @"senderId not idenitified"}];
+            [weakSelf fireError:error];
         }
     }];
     
@@ -1271,26 +1279,34 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
         if (photoURL) {
             JSQPhotoMediaItem *mediaItem = [self.photoMessageMap objectForKey:key];
             if (mediaItem) {
-                [self fetchImageDataAtURL:photoURL
+                [weakSelf fetchImageDataAtURL:photoURL
                              forMediaItem:mediaItem clearsPhotoMessageMapOnSuccessForKey:key
                                 indexPath:nil];
             }
+        }
+        else {
+            NSError *error = [NSError errorWithDomain:CHAT_ERROR_DOMAIN
+                                                 code:-1
+                                             userInfo:@{@"error" : @"photoURL not identified"}];
+            [weakSelf fireError:error];
         }
     }];
 }
 
 - (void)observeTyping {
+    __weak  typeof(self) weakSelf = self;
+    
     FIRDatabaseReference *typingIndicatorRef = [self.channelRef child:@"typingIndicator"];
     self.userIsTypingRef = [typingIndicatorRef child:_senderId];
     [self.userIsTypingRef onDisconnectRemoveValue];
     
     [self.userIsTypingQuery observeEventType:FIRDataEventTypeValue withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
-        if (snapshot.childrenCount == 1 && self.isTyping) {
+        if (snapshot.childrenCount == 1 && weakSelf.isTyping) {
             return;
         }
         
-        self.showTypingIndicator = snapshot.childrenCount > 0;
-        [self scrollToBottomAnimated:YES];
+        weakSelf.showTypingIndicator = snapshot.childrenCount > 0;
+        [weakSelf scrollToBottomAnimated:YES];
     }];
 }
 
@@ -1324,7 +1340,6 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
                                 [weakSelf.collectionView reloadData];
                         });
                         
-                        
                         [weakSelf.photoMessageMap removeObjectForKey:key];
                     }
                     else {
@@ -1340,13 +1355,13 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     __weak typeof(self) weakSelf = self;
     [storageRef dataWithMaxSize:INT64_MAX completion:^(NSData * _Nullable data, NSError * _Nullable error) {
         if (error) {
-            //Handle error
+            [weakSelf fireError:error];
             return;
         }
         
         [storageRef metadataWithCompletion:^(FIRStorageMetadata * _Nullable metadata, NSError * _Nullable error) {
             if (error) {
-                //Handle error
+                [weakSelf fireError:error];
                 return;
             }
             if ([metadata.contentType isEqualToString:@"image/gif"]) {
@@ -1388,15 +1403,15 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
                 
                 NSString *path = [NSString stringWithFormat:@"%@/%ld/%@", [FIRAuth auth].currentUser.uid,(long)([NSDate timeIntervalSinceReferenceDate] * 1000), photoReferenceUrl.lastPathComponent];
                 
+                __weak typeof(self) weakSelf = self;
                 [[self.storageRef child:path] putFile:imageFileURL metadata:nil completion:^(FIRStorageMetadata * _Nullable metadata, NSError * _Nullable error) {
                     if (error) {
-                        //handle error
+                        [weakSelf fireError:error];
                         return;
                     }
-                    [self setImageURL:[self.storageRef child:metadata.path].description forMessageWithKey:key];
+                    [weakSelf setImageURL:[weakSelf.storageRef child:metadata.path].description forMessageWithKey:key];
                     
                 }];
-                
             }];
         }
     }
@@ -1416,7 +1431,7 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
             __weak typeof(self) weakSelf = self;
             [[self.storageRef child:imagePath] putData:imageData metadata:metadata completion:^(FIRStorageMetadata * _Nullable metadata, NSError * _Nullable error) {
                 if (error) {
-                    //Handle error
+                    [weakSelf fireError:error];
                     return;
                 }
                 
@@ -1430,6 +1445,25 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
+#pragma mark - error
+
+- (void)fireError:(NSError *)error {
+    if (self.onError) {
+        self.onError(error);
+    }
+}
+
+#pragma mark - onChatLoaded
+
+- (void)fireChatLoaded {
+    if (!self.alreadyLoaded) {
+        if (self.onChatDidLoad) {
+            self.onChatDidLoad();
+        }
+        
+        self.alreadyLoaded = true;
+    }
+}
 
 #pragma mark - dealloc
 

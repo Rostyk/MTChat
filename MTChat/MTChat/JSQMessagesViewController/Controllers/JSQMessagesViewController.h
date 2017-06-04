@@ -22,6 +22,9 @@
 #import "JSQMessagesCollectionViewFlowLayout.h"
 #import "JSQMessagesInputToolbar.h"
 
+typedef void (^chatErrorBlock) (NSError * _Nonnull error);
+typedef void (^chatDidLoadBlock) ();
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -33,6 +36,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface JSQMessagesViewController : UIViewController <JSQMessagesCollectionViewDataSource,
                                                          JSQMessagesCollectionViewDelegateFlowLayout,
                                                          UITextViewDelegate>
+
+/**
+ *  Chat finished loading block
+ */
+@property (nonatomic) chatDidLoadBlock onChatDidLoad;
+
+/**
+ *  Error block
+ */
+@property (nonatomic) chatErrorBlock onError;
 
 /**
  *  Your own avatar URL
