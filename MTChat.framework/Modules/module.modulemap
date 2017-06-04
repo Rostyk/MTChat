@@ -1,0 +1,6 @@
+framework module MTChat {
+  umbrella header "MTChat.h"
+
+  export *
+  module * { export * }
+}

@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		47709F5F1EE4220F0033DF24 /* UniversalFramework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 47709F601EE4220F0033DF24 /* Build configuration list for PBXAggregateTarget "UniversalFramework" */;
+			buildPhases = (
+				47709F631EE422270033DF24 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = UniversalFramework;
+			productName = UniversalFramework;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		4771B1481EDEC25C004810D5 /* Nullability.h in Headers */ = {isa = PBXBuildFile; fileRef = 4771B1411EDEC25C004810D5 /* Nullability.h */; };
 		4771B1491EDEC25C004810D5 /* PINCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 4771B1421EDEC25C004810D5 /* PINCache.h */; };
@@ -690,6 +704,11 @@
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = Rostyslav.Stepanyak;
 				TargetAttributes = {
+					47709F5F1EE4220F0033DF24 = {
+						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = 77QD7V8745;
+						ProvisioningStyle = Automatic;
+					};
 					47943BD21ED9D203004F6B6A = {
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = 77QD7V8745;
@@ -710,6 +729,7 @@
 			projectRoot = "";
 			targets = (
 				47943BD21ED9D203004F6B6A /* MTChat */,
+				47709F5F1EE4220F0033DF24 /* UniversalFramework */,
 			);
 		};
 /* End PBXProject section */
@@ -731,6 +751,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		47709F631EE422270033DF24 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\n\nUNIVERSAL_OUTPUTFOLDER=${BUILD_DIR}/${CONFIGURATION}-universal\n\n# make sure the output directory exists\nmkdir -p \"${UNIVERSAL_OUTPUTFOLDER}/iOS\"\n\n# Step 1. Build Device and Simulator versions on iOS\nxcodebuild -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${PROJECT_NAME}\"  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6' clean build\nxcodebuild -project \"${PROJECT_NAME}.xcodeproj\" -scheme \"${PROJECT_NAME}\" -sdk iphoneos clean build\n\n# Step 2. Copy the framework structure (from iphoneos build) to the universal folder\ncp -R \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${PROJECT_NAME}.framework\" \"${UNIVERSAL_OUTPUTFOLDER}/iOS\"\n\n# Step 3. Create universal binary file using lipo and place the combined executable in the copied framework directory\nlipo -create -output \"${UNIVERSAL_OUTPUTFOLDER}/iOS/${PROJECT_NAME}.framework/${PROJECT_NAME}\" \"${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${PROJECT_NAME}.framework/${PROJECT_NAME}\" \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${PROJECT_NAME}.framework/${PROJECT_NAME}\"\n\n# Step 4. Convenience step to copy the framework to the project's directory\nmkdir -p \"${TMPDIR}/${PROJECT_NAME}/Frameworks/iOS\"\n\ncp -R \"${UNIVERSAL_OUTPUTFOLDER}/iOS/${PROJECT_NAME}.framework\" \"${TMPDIR}/${PROJECT_NAME}/Frameworks/iOS\"\n\n\n# Step 6. Create .tar.gz file for posting on the binary repository\ncd \"${TMPDIR}\"\n\n# We nest the framework inside a Frameworks folder so that it unarchives correctly\ntar -zcf \"${PROJECT_NAME}.framework.tar.gz\" \"${PROJECT_NAME}/Frameworks/\"\nmv \"${PROJECT_NAME}.framework.tar.gz\" \"${PROJECT_DIR}/\"\n\n# Step 7. Convenience step to open the project's directory in Finder\n#open \"${PROJECT_DIR}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		47943BCE1ED9D203004F6B6A /* Sources */ = {
@@ -792,6 +828,33 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		47709F611EE4220F0033DF24 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					armv7s,
+				);
+				DEVELOPMENT_TEAM = 77QD7V8745;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "arm64 armv7 armv7s i386 x86_64";
+			};
+			name = Debug;
+		};
+		47709F621EE4220F0033DF24 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					armv7s,
+				);
+				DEVELOPMENT_TEAM = 77QD7V8745;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "arm64 armv7 armv7s i386 x86_64";
+			};
+			name = Release;
+		};
 		47943BD91ED9D203004F6B6A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -945,6 +1008,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		47709F601EE4220F0033DF24 /* Build configuration list for PBXAggregateTarget "UniversalFramework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				47709F611EE4220F0033DF24 /* Debug */,
+				47709F621EE4220F0033DF24 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		47943BCD1ED9D203004F6B6A /* Build configuration list for PBXProject "MTChat" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

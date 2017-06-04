@@ -134,6 +134,7 @@
 				47943CE51ED9E4CE004F6B6A /* Frameworks */,
 				47943CE61ED9E4CE004F6B6A /* Resources */,
 				47CA82B61ED9EBDA008222EA /* Embed Frameworks */,
+				474FA0621EE419F50008D85D /* Universal library */,
 			);
 			buildRules = (
 			);
@@ -207,6 +208,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		474FA0621EE419F50008D85D /* Universal library */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Universal library";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		47943CE41ED9E4CE004F6B6A /* Sources */ = {
