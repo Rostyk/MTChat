@@ -65,3 +65,31 @@ chatViewController.senderAvatarURL = @"https://images-na.ssl-images-amazon.com/i
     
 [self.navigationController pushViewController:chatViewController animated:YES];
 ```
+# Backend. Firebase database and storage for photos
+
+![alt text](https://www.dropbox.com/s/e3weh8x3de7y4ff/firebasedatabase.png?dl=1)
+<br>
+`Channels` contain the list of channels. `Messages` keep the conversation history. Appending new node in `messages` will automatically result in new incoming message. 
+
+## Messages
+There're two types of messages:
+1. Text message
+2. Photo message
+
+### Text message
+It consists of:
+* `senderId`. A simple unique id of the user who sent the message. Should not contain special symbols llike @, /, "", etc.
+* `senderName`. A name of the user that sent a message. It will show up visually in the chat.
+* `text`. Text of the message.
+
+### Photo message
+It consists of:
+* `photoURL`. The url of to the photo in the Firebase Storate.
+* `senderId`. A simple unique id of the user who sent the message. Should not contain special symbols llike @, /, "", etc.
+
+## Firebase Storage
+![alt text](https://www.dropbox.com/s/ok7xaw3szmk9k8b/firebasestorage.png?dl=1)
+<br>
+The storage persis all the images sent in chat. In this example the structure of the storage is the following:
+Every user has its own foler in the root folder of the storage. Folder name is the user id and the filename of the picture inside that folder is just the time when user sent that picture.
+`Firebase.auth().currenuser().uid()/[timestamp].jpg`
