@@ -77,7 +77,11 @@ chatViewController.senderAvatarURL = @"https://images-na.ssl-images-amazon.com/i
 
 ![alt text](https://www.dropbox.com/s/e3weh8x3de7y4ff/firebasedatabase.png?dl=1)
 <br>
-`Channels` contain the list of channels. `Messages` keep the conversation history. Appending new node in `messages` will automatically result in new incoming message. 
+`Channels` contain the list of channels. `Messages` keep the conversation history. Appending new node in `messages` will automatically result in new incoming message.
+
+## Typing indicator
+`typingIndicator` node indicates the user typing the message at the moment. In the screenshot above `typingIndicator` contains `user2 : 1`. `1` is the integer value indicating the typing process. It means that user2 is typing message at the moment. If the `typingIndicator` is empty it means that no one is typing the message at the moment.
+
 
 ## Messages
 There're two types of messages:
