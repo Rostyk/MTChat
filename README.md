@@ -6,7 +6,7 @@ Maliwan chat backed back-ended with Firebase.
 # Features
 - Typing indicator
 - Photo messages
-- Avatars as urls or as iamges
+- Avatars as urls or as images
 
 # How to integrate
 
